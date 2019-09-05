@@ -1,0 +1,7 @@
+# AWS3A document generator jazzy settings
+
+copyright: Copyright 2019 3Advance LLC
+author: Mark Evans
+xcodebuild_arguments: [-target, AWS3A-iOS]
+clean: true
+output: ./Documentation
