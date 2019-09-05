@@ -7,16 +7,16 @@
 //
 
 import Foundation
+import UIKit
 
 @objc public class AWSService: NSObject {
-
     // MARK: Properties
 
     var session = URLSession()
 
-    private let baseURL = "https://cognito-idp.us-east-1.amazonaws.com"
-    private let clientId = "3sp07ftnukvjcm05ovrn387evm"
     private let unknownError = NSError(domain: "Internal Server Error", code: 500, userInfo: nil)
+    private var baseURL = ""
+    private var clientId = ""
 
     public typealias AWSCompletionHandler = (_ success: Any?, _ error: NSError?) -> Void
     public typealias AWSCompletionBoolHandler = (_ success: Bool) -> Void
@@ -34,6 +34,12 @@ import Foundation
     private func setupManager() {
         let config = URLSessionConfiguration.default
         self.session = URLSession(configuration: config)
+    }
+
+
+    public func start(url: String?, clientId: String) {
+        self.baseURL = url ?? "https://cognito-idp.us-east-1.amazonaws.com"
+        self.clientId = clientId
     }
 
     // MARK: AWS Restful Methods
