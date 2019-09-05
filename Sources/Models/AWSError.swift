@@ -9,6 +9,7 @@
 import Foundation
 
 struct AWSError: Codable {
+    public static let unknownError = NSError(domain: "Internal Server Error", code: 500, userInfo: nil)
     var message: String?
 
     enum CodingKeys: String, CodingKey {

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                      = "AWS3A"
-  s.version                   = "1.0.0"
+  s.version                   = "1.0.1"
   s.summary                   = "AWS3A"
   s.homepage                  = "https://github.com/MarkEvans/AWS3A"
   s.license                   = { :type => "MIT", :file => "LICENSE" }

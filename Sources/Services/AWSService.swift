@@ -10,12 +10,10 @@ import Foundation
 import UIKit
 
 @objc public class AWSService: NSObject {
+
     // MARK: Properties
 
-    var session = URLSession()
-
-    private let unknownError = NSError(domain: "Internal Server Error", code: 500, userInfo: nil)
-    private var baseURL = ""
+    private var awsSession = URLSession()
     private var clientId = ""
 
     public typealias AWSCompletionHandler = (_ success: Any?, _ error: NSError?) -> Void
@@ -33,12 +31,11 @@ import UIKit
 
     private func setupManager() {
         let config = URLSessionConfiguration.default
-        self.session = URLSession(configuration: config)
+        self.awsSession = URLSession(configuration: config)
     }
 
 
-    public func start(url: String?, clientId: String) {
-        self.baseURL = url ?? "https://cognito-idp.us-east-1.amazonaws.com"
+    public func initialize(clientId: String) {
         self.clientId = clientId
     }
 
@@ -46,17 +43,17 @@ import UIKit
 
     public func registerUser(email: String, password: String, completion: @escaping AWSCompletionHandler) {
         DispatchQueue(label: "background", qos: .background).async {
-            let urlRequest = AWSRequest.requestRegisterUser(url: self.baseURL, clientId: self.clientId, email: email, password: password)
-            self.session.dataTask(with: urlRequest) { data, response, error in
+            let urlRequest = AWSRequest.requestRegisterUser(clientId: self.clientId, email: email, password: password)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
                 guard let data = data, let response = response as? HTTPURLResponse else {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: 500, data: nil, error: self.unknownError))
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
                     }
                     return
                 }
                 let responseCode = response.statusCode
                 do {
-                    if responseCode >= 200 && responseCode < 300 {
+                    if responseCode.isValid {
                         let res = try JSONDecoder().decode(AWSResponse.self, from: data)
                         DispatchQueue.main.async {
                             completion(res, nil)
@@ -65,12 +62,12 @@ import UIKit
                     else {
                         let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
                         DispatchQueue.main.async {
-                            completion(nil, self.handleError(responseCode: responseCode, error: errorObject))
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
                         }
                     }
                 } catch let catchError {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: responseCode, data: data, error: catchError))
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
                     }
                 }
                 }.resume()
@@ -79,17 +76,17 @@ import UIKit
 
     public func confirmRegisterUser(email: String, code: String, completion: @escaping AWSCompletionHandler) {
         DispatchQueue(label: "background", qos: .background).async {
-            let urlRequest = AWSRequest.requestConfirmRegisterUser(url: self.baseURL, clientId: self.clientId, email: email, code: code)
-            self.session.dataTask(with: urlRequest) { data, response, error in
+            let urlRequest = AWSRequest.requestConfirmRegisterUser(clientId: self.clientId, email: email, code: code)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
                 guard let data = data, let response = response as? HTTPURLResponse else {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: 500, data: nil, error: self.unknownError))
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
                     }
                     return
                 }
                 let responseCode = response.statusCode
                 do {
-                    if responseCode >= 200 && responseCode < 300 {
+                    if responseCode.isValid {
                         DispatchQueue.main.async {
                             completion(true, nil)
                         }
@@ -97,12 +94,12 @@ import UIKit
                     else {
                         let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
                         DispatchQueue.main.async {
-                            completion(nil, self.handleError(responseCode: responseCode, error: errorObject))
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
                         }
                     }
                 } catch let catchError {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: responseCode, data: data, error: catchError))
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
                     }
                 }
                 }.resume()
@@ -111,17 +108,17 @@ import UIKit
 
     public func loginUser(email: String, password: String, completion: @escaping AWSCompletionHandler) {
         DispatchQueue(label: "background", qos: .background).async {
-            let urlRequest = AWSRequest.requestLoginUser(url: self.baseURL, clientId: self.clientId, email: email, password: password)
-            self.session.dataTask(with: urlRequest) { data, response, error in
+            let urlRequest = AWSRequest.requestLoginUser(clientId: self.clientId, email: email, password: password)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
                 guard let data = data, let response = response as? HTTPURLResponse else {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: 500, data: nil, error: self.unknownError))
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
                     }
                     return
                 }
                 let responseCode = response.statusCode
                 do {
-                    if responseCode >= 200 && responseCode < 300 {
+                    if responseCode.isValid {
                         let res = try JSONDecoder().decode(AWSResponse.self, from: data)
                         DispatchQueue.main.async {
                             completion(res, nil)
@@ -130,12 +127,12 @@ import UIKit
                     else {
                         let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
                         DispatchQueue.main.async {
-                            completion(nil, self.handleError(responseCode: responseCode, error: errorObject))
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
                         }
                     }
                 } catch let catchError {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: responseCode, data: data, error: catchError))
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
                     }
                 }
                 }.resume()
@@ -144,17 +141,17 @@ import UIKit
 
     public func confirmUser(email: String, newPassword: String, session: String, completion: @escaping AWSCompletionHandler) {
         DispatchQueue(label: "background", qos: .background).async {
-            let urlRequest = AWSRequest.requestConfirmUser(url: self.baseURL, clientId: self.clientId, email: email, newPassword: newPassword, session: session)
-            self.session.dataTask(with: urlRequest) { data, response, error in
+            let urlRequest = AWSRequest.requestConfirmUser(clientId: self.clientId, email: email, newPassword: newPassword, session: session)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
                 guard let data = data, let response = response as? HTTPURLResponse else {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: 500, data: nil, error: self.unknownError))
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
                     }
                     return
                 }
                 let responseCode = response.statusCode
                 do {
-                    if responseCode >= 200 && responseCode < 300 {
+                    if responseCode.isValid {
                         DispatchQueue.main.async {
                             completion(true, nil)
                         }
@@ -162,12 +159,12 @@ import UIKit
                     else {
                         let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
                         DispatchQueue.main.async {
-                            completion(nil, self.handleError(responseCode: responseCode, error: errorObject))
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
                         }
                     }
                 } catch let catchError {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: responseCode, data: data, error: catchError))
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
                     }
                 }
                 }.resume()
@@ -176,17 +173,17 @@ import UIKit
 
     public func refreshToken(refreshToken: String, completion: @escaping AWSCompletionHandler) {
         DispatchQueue(label: "background", qos: .background).async {
-            let urlRequest = AWSRequest.requestRefreshToken(url: self.baseURL, clientId: self.clientId, refreshToken: refreshToken)
-            self.session.dataTask(with: urlRequest) { data, response, error in
+            let urlRequest = AWSRequest.requestRefreshToken(clientId: self.clientId, refreshToken: refreshToken)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
                 guard let data = data, let response = response as? HTTPURLResponse else {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: 500, data: nil, error: self.unknownError))
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
                     }
                     return
                 }
                 let responseCode = response.statusCode
                 do {
-                    if responseCode >= 200 && responseCode < 300 {
+                    if responseCode.isValid {
                         let res = try JSONDecoder().decode(AWSResponse.self, from: data)
                         DispatchQueue.main.async {
                             completion(res, nil)
@@ -195,12 +192,12 @@ import UIKit
                     else {
                         let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
                         DispatchQueue.main.async {
-                            completion(nil, self.handleError(responseCode: responseCode, error: errorObject))
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
                         }
                     }
                 } catch let catchError {
                     DispatchQueue.main.async {
-                        completion(nil, self.handleError(responseCode: responseCode, data: data, error: catchError))
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
                     }
                 }
             }.resume()
@@ -209,23 +206,21 @@ import UIKit
 
     // MARK: Error Handling Methods
 
-    func handleError(responseCode: Int, data: Data?, error: Error?) -> NSError? {
-        let errorMessage = error?.localizedDescription ?? "Internal Server Error"
+    private func awsHandleError(responseCode: Int, data: Data?, error: Error?) -> NSError? {
+        let errorMessage = error?.localizedDescription ?? AWSError.unknownError.domain
         guard let data = data else {
             return NSError(domain: errorMessage, code: responseCode, userInfo: nil)
         }
         do {
-            let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
-            print("handleError json: \(json)")
-//            let errorObject = Mapper<ClientError>().map(JSONObject: json)
-            return NSError(domain: errorMessage, code: responseCode, userInfo: nil) //NSError(domain: errorObject?.error ?? errorMessage, code: error?.asAFError?.responseCode ?? 500, userInfo: nil)
+            let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
+            return self.awsHandleError(responseCode: responseCode, error: errorObject)
         } catch _ {
             return NSError(domain: errorMessage, code: responseCode, userInfo: nil)
         }
     }
 
-    func handleError(responseCode: Int, error: AWSError?) -> NSError? {
-        let errorMessage = error?.message ?? "Internal Server Error"
+    private func awsHandleError(responseCode: Int, error: AWSError?) -> NSError? {
+        let errorMessage = error?.message ?? AWSError.unknownError.domain
         return NSError(domain: errorMessage, code: responseCode, userInfo: nil)
     }
 }

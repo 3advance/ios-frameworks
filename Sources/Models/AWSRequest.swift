@@ -81,6 +81,8 @@ struct UserContextData: Codable {
 }
 
 extension AWSRequest {
+    static var defaultDomain = "https://cognito-idp.us-east-1.amazonaws.com"
+
     var json: String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -107,8 +109,8 @@ extension AWSRequest {
 }
 
 extension AWSRequest {
-    static func requestRegisterUser(url: String, clientId: String, email: String, password: String) -> URLRequest {
-        let url = URL(string: url)!
+    static func requestRegisterUser(clientId: String, email: String, password: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
         var urlRequest = URLRequest(url: url)
         urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("AWSCognitoIdentityProviderService.SignUp", forHTTPHeaderField: "X-Amz-Target")
@@ -117,8 +119,8 @@ extension AWSRequest {
         return urlRequest
     }
 
-    static func requestConfirmRegisterUser(url: String, clientId: String, email: String, code: String) -> URLRequest {
-        let url = URL(string: url)!
+    static func requestConfirmRegisterUser(clientId: String, email: String, code: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
         var urlRequest = URLRequest(url: url)
         urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("AWSCognitoIdentityProviderService.ConfirmSignUp", forHTTPHeaderField: "X-Amz-Target")
@@ -127,8 +129,8 @@ extension AWSRequest {
         return urlRequest
     }
 
-    static func requestLoginUser(url: String, clientId: String, email: String, password: String) -> URLRequest {
-        let url = URL(string: url)!
+    static func requestLoginUser(clientId: String, email: String, password: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
         var urlRequest = URLRequest(url: url)
         urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("AWSCognitoIdentityProviderService.InitiateAuth", forHTTPHeaderField: "X-Amz-Target")
@@ -137,8 +139,8 @@ extension AWSRequest {
         return urlRequest
     }
 
-    static func requestConfirmUser(url: String, clientId: String, email: String, newPassword: String, session: String) -> URLRequest {
-        let url = URL(string: url)!
+    static func requestConfirmUser(clientId: String, email: String, newPassword: String, session: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
         var urlRequest = URLRequest(url: url)
         urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("AWSCognitoIdentityProviderService.RespondToAuthChallenge", forHTTPHeaderField: "X-Amz-Target")
@@ -147,8 +149,8 @@ extension AWSRequest {
         return urlRequest
     }
 
-    static func requestRefreshToken(url: String, clientId: String, refreshToken: String) -> URLRequest {
-        let url = URL(string: url)!
+    static func requestRefreshToken(clientId: String, refreshToken: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
         var urlRequest = URLRequest(url: url)
         urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
         urlRequest.setValue("AWSCognitoIdentityProviderService.InitiateAuth", forHTTPHeaderField: "X-Amz-Target")
@@ -182,5 +184,11 @@ extension AWSRequest {
     static private func confirmRegisterUserBody(clientId: String, username: String, code: String) -> Data? {
         let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: username, confirmationCode: code, forceAliasCreation: true, session: nil, userAttributes: [UserAttributes(name: "email", value: username)], userContextData: nil, challengeName: nil, challengeResponses: nil)
         return request.data
+    }
+}
+
+extension Int {
+    var isValid: Bool {
+        return self >= 200 && self < 300
     }
 }
