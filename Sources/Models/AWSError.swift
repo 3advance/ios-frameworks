@@ -9,7 +9,11 @@
 import Foundation
 
 struct AWSError: Codable {
+
     public static let unknownError = NSError(domain: "Internal Server Error", code: 500, userInfo: nil)
+    public static let emptyPhoneNumberError = NSError(domain: "Phone Number should not be empty!", code: 400, userInfo: nil)
+    public static let emptyCodeError = NSError(domain: "Code should not be empty!", code: 400, userInfo: nil)
+
     var message: String?
 
     enum CodingKeys: String, CodingKey {

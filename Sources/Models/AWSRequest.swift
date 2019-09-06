@@ -47,12 +47,14 @@ struct AWSRequest: Codable {
 struct AuthParameters: Codable {
     var username: String?
     var password: String?
+    var answer: String?
     var refreshToken: String?
     var deviceKey: String?
 
     enum CodingKeys: String, CodingKey {
         case username = "USERNAME"
         case password = "PASSWORD"
+        case answer = "ANSWER"
         case refreshToken = "REFRESH_TOKEN"
         case deviceKey = "DEVICE_KEY"
     }
@@ -71,10 +73,12 @@ public struct UserAttributes: Codable {
 struct ChallengeResponses: Codable {
     var username: String?
     var newPassword: String?
+    var answer: String?
 
     enum CodingKeys: String, CodingKey {
         case username = "USERNAME"
         case newPassword = "NEW_PASSWORD"
+        case answer = "ANSWER"
     }
 }
 
@@ -214,21 +218,41 @@ extension AWSRequest {
         urlRequest.httpBody = AWSRequest.resetConfirmPasswordBody(clientId: clientId, username: username, password: password, code: code)
         return urlRequest
     }
+
+    static func requestSMSCode(clientId: String, phoneNumber: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.InitiateAuth", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.requestSMSCodeBody(clientId: clientId, phoneNumber: phoneNumber)
+        return urlRequest
+    }
+
+    static func requestConfirmSMSCode(clientId: String, phoneNumber: String, code: String, session: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.RespondToAuthChallenge", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.requestConfirmSMSBody(clientId: clientId, phoneNumber: phoneNumber, code: code, session: session)
+        return urlRequest
+    }
 }
 
 extension AWSRequest {
     static private func refreshTokenBody(clientId: String, refreshToken: String) -> Data? {
-        let request = AWSRequest(authParameters: AuthParameters(username: nil, password: nil, refreshToken: refreshToken, deviceKey: nil), authFlow: "REFRESH_TOKEN_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        let request = AWSRequest(authParameters: AuthParameters(username: nil, password: nil, answer: nil, refreshToken: refreshToken, deviceKey: nil), authFlow: "REFRESH_TOKEN_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
     static private func loginUserBody(clientId: String, username: String, password: String) -> Data? {
-        let request = AWSRequest(authParameters: AuthParameters(username: username, password: password, refreshToken: nil, deviceKey: nil), authFlow: "USER_PASSWORD_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        let request = AWSRequest(authParameters: AuthParameters(username: username, password: password, answer: nil, refreshToken: nil, deviceKey: nil), authFlow: "USER_PASSWORD_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
     static private func confirmUserBody(clientId: String, username: String, newPassword: String, session: String) -> Data? {
-        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: session, userAttributes: nil, userContextData: nil, challengeName: "NEW_PASSWORD_REQUIRED", challengeResponses: ChallengeResponses(username: username, newPassword: newPassword), accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: session, userAttributes: nil, userContextData: nil, challengeName: "NEW_PASSWORD_REQUIRED", challengeResponses: ChallengeResponses(username: username, newPassword: newPassword, answer: nil), accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
@@ -266,10 +290,61 @@ extension AWSRequest {
         let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: password, username: username, confirmationCode: code, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
+
+    static private func requestSMSCodeBody(clientId: String, phoneNumber: String) -> Data? {
+        let request = AWSRequest(authParameters: AuthParameters(username: phoneNumber, password: nil, answer: nil, refreshToken: nil, deviceKey: nil), authFlow: "CUSTOM_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        return request.data
+    }
+
+    static private func requestConfirmSMSBody(clientId: String, phoneNumber: String, code: String, session: String) -> Data? {
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: session, userAttributes: nil, userContextData: nil, challengeName: "CUSTOM_CHALLENGE", challengeResponses: ChallengeResponses(username: phoneNumber, newPassword: nil, answer: code), accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        return request.data
+    }
 }
 
 extension Int {
     var isValid: Bool {
         return self >= 200 && self < 300
+    }
+}
+
+extension String {
+    var phoneDigits: String {
+        return components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+    }
+
+    var formattedNumber: String {
+        var phoneNumber = self.phoneDigits
+        let mask = "XXX-XXX-XXXX"
+        switch phoneNumber.count {
+        case 11:
+            phoneNumber.removeFirst()
+        case 12:
+            phoneNumber.removeFirst()
+            phoneNumber.removeFirst()
+        default:
+            print("")
+        }
+        if phoneNumber.count > 10 {
+            return ""
+        }
+        var result = ""
+        var index = phoneNumber.startIndex
+        mask.forEach({
+            if index != phoneNumber.endIndex {
+                if $0 == "X" {
+                    result.append(phoneNumber[index])
+                    index = phoneNumber.index(after: index)
+                }
+                else {
+                    result.append($0)
+                }
+            }
+        })
+        return result
+    }
+
+    public func toPhoneNumber() -> String {
+        return self.replacingOccurrences(of: "(\\d{3})(\\d{3})(\\d+)", with: "($1) $2-$3", options: .regularExpression, range: nil)
     }
 }

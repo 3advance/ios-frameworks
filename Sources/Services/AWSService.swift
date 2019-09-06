@@ -398,6 +398,99 @@ import UIKit
         }
     }
 
+    public func requestSMSCode(phone: String, completion: @escaping AWSCompletionHandler) {
+        DispatchQueue(label: "background", qos: .background).async {
+            var phoneNumber = phone.trimmingCharacters(in: .whitespaces)
+            if phoneNumber.isEmpty {
+                DispatchQueue.main.async {
+                    completion(nil, AWSError.emptyPhoneNumberError)
+                }
+                return
+            }
+            phoneNumber = (phoneNumber.contains("+1")) ? phoneNumber : "+1\(phoneNumber.phoneDigits)"
+            let urlRequest = AWSRequest.requestSMSCode(clientId: self.clientId, phoneNumber: phoneNumber)
+            self.consoleLog("AWS3A SDK: Reset SMS Code", "🌐 requestSMSCode(phoneNumber: \(phoneNumber))")
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
+                guard let data = data, let response = response as? HTTPURLResponse else {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
+                    }
+                    return
+                }
+                let responseCode = response.statusCode
+                do {
+                    if responseCode.isValid {
+                        let res = try JSONDecoder().decode(AWSResponse.self, from: data)
+                        DispatchQueue.main.async {
+                            self.consoleLog("AWS3A SDK - requestSMSCode: response", "✅ Success: [\(responseCode)] ❗️\n\(res.json)")
+                            completion(res, nil)
+                        }
+                    }
+                    else {
+                        let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
+                        DispatchQueue.main.async {
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
+                        }
+                    }
+                } catch let catchError {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
+                    }
+                }
+            }.resume()
+        }
+    }
+
+    public func confirmSMSCode(phone: String, code: String, session: String, completion: @escaping AWSCompletionHandler) {
+        DispatchQueue(label: "background", qos: .background).async {
+            var phoneNumber = phone.trimmingCharacters(in: .whitespaces)
+            let smsCode = code.trimmingCharacters(in: .whitespaces)
+            if phoneNumber.isEmpty {
+                DispatchQueue.main.async {
+                    completion(nil, AWSError.emptyPhoneNumberError)
+                }
+                return
+            }
+            if smsCode.isEmpty {
+                DispatchQueue.main.async {
+                    completion(nil, AWSError.emptyCodeError)
+                }
+                return
+            }
+            phoneNumber = (phoneNumber.contains("+1")) ? phoneNumber : "+1\(phoneNumber.phoneDigits)"
+            let urlRequest = AWSRequest.requestConfirmSMSCode(clientId: self.clientId, phoneNumber: phoneNumber, code: smsCode, session: session)
+            self.consoleLog("AWS3A SDK: Confirm SMS Code", "🌐 requestConfirmSMSCode(phoneNumber: \(phoneNumber), code: \(smsCode), session: \(session))")
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
+                guard let data = data, let response = response as? HTTPURLResponse else {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
+                    }
+                    return
+                }
+                let responseCode = response.statusCode
+                do {
+                    if responseCode.isValid {
+                        let res = try JSONDecoder().decode(AWSResponse.self, from: data)
+                        DispatchQueue.main.async {
+                            self.consoleLog("AWS3A SDK - requestConfirmSMSCode: response", "✅ Success: [\(responseCode)] ❗️\n\(res.json)")
+                            completion(res, nil)
+                        }
+                    }
+                    else {
+                        let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
+                        DispatchQueue.main.async {
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
+                        }
+                    }
+                } catch let catchError {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
+                    }
+                }
+                }.resume()
+        }
+    }
+
     // MARK: Error Handling Methods
 
     private func awsHandleError(responseCode: Int, data: Data?, error: Error?) -> NSError? {
