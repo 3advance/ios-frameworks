@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ///   - launchOptions: The LaunchOptions
     /// - Returns: The launch result
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        AWSService.shared.enableLogs = true
         AWSService.shared.initialize(clientId: "3sp07ftnukvjcm05ovrn387evm")
         // Initialize UIWindow
         self.window = .init(frame: UIScreen.main.bounds)

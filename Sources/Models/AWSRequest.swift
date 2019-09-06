@@ -21,6 +21,9 @@ struct AWSRequest: Codable {
     var userContextData: UserContextData?
     var challengeName: String?
     var challengeResponses: ChallengeResponses?
+    var accessToken: String?
+    var previousPassword: String?
+    var proposedPassword: String?
 
     enum CodingKeys: String, CodingKey {
         case authParameters = "AuthParameters"
@@ -35,6 +38,9 @@ struct AWSRequest: Codable {
         case userContextData = "UserContextData"
         case challengeName = "ChallengeName"
         case challengeResponses = "ChallengeResponses"
+        case accessToken = "AccessToken"
+        case previousPassword = "PreviousPassword"
+        case proposedPassword = "ProposedPassword"
     }
 }
 
@@ -52,7 +58,7 @@ struct AuthParameters: Codable {
     }
 }
 
-struct UserAttributes: Codable {
+public struct UserAttributes: Codable {
     var name: String?
     var value: String?
 
@@ -158,31 +164,106 @@ extension AWSRequest {
         urlRequest.httpBody = AWSRequest.refreshTokenBody(clientId: clientId, refreshToken: refreshToken)
         return urlRequest
     }
+
+    static func requestLogout(clientId: String, accessToken: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.GlobalSignOut", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.logoutBody(clientId: clientId, accessToken: accessToken)
+        return urlRequest
+    }
+
+    static func requestValidateUser(clientId: String, accessToken: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.GetUser", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.validateUserBody(clientId: clientId, accessToken: accessToken)
+        return urlRequest
+    }
+
+    static func requestChangePassword(clientId: String, accessToken: String, previousPassword: String, proposedPassword: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.ChangePassword", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.changePasswordBody(clientId: clientId, accessToken: accessToken, previousPassword: previousPassword, proposedPassword: proposedPassword)
+        return urlRequest
+    }
+
+    static func requestResetPassword(clientId: String, username: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.ForgotPassword", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.resetPasswordBody(clientId: clientId, username: username)
+        return urlRequest
+    }
+
+    static func requestResetConfirmPassword(clientId: String, username: String, password: String, code: String) -> URLRequest {
+        let url = URL(string: AWSRequest.defaultDomain)!
+        var urlRequest = URLRequest(url: url)
+        urlRequest.setValue("application/x-amz-json-1.1", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue("AWSCognitoIdentityProviderService.ConfirmForgotPassword", forHTTPHeaderField: "X-Amz-Target")
+        urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = AWSRequest.resetConfirmPasswordBody(clientId: clientId, username: username, password: password, code: code)
+        return urlRequest
+    }
 }
 
 extension AWSRequest {
     static private func refreshTokenBody(clientId: String, refreshToken: String) -> Data? {
-        let request = AWSRequest(authParameters: AuthParameters(username: nil, password: nil, refreshToken: refreshToken, deviceKey: nil), authFlow: "REFRESH_TOKEN_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil)
+        let request = AWSRequest(authParameters: AuthParameters(username: nil, password: nil, refreshToken: refreshToken, deviceKey: nil), authFlow: "REFRESH_TOKEN_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
     static private func loginUserBody(clientId: String, username: String, password: String) -> Data? {
-        let request = AWSRequest(authParameters: AuthParameters(username: username, password: password, refreshToken: nil, deviceKey: nil), authFlow: "USER_PASSWORD_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil)
+        let request = AWSRequest(authParameters: AuthParameters(username: username, password: password, refreshToken: nil, deviceKey: nil), authFlow: "USER_PASSWORD_AUTH", clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
     static private func confirmUserBody(clientId: String, username: String, newPassword: String, session: String) -> Data? {
-        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: session, userAttributes: nil, userContextData: nil, challengeName: "NEW_PASSWORD_REQUIRED", challengeResponses: ChallengeResponses(username: username, newPassword: newPassword))
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: session, userAttributes: nil, userContextData: nil, challengeName: "NEW_PASSWORD_REQUIRED", challengeResponses: ChallengeResponses(username: username, newPassword: newPassword), accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
     static private func registerUserBody(clientId: String, username: String, password: String) -> Data? {
-        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: password, username: username, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: [UserAttributes(name: "email", value: username)], userContextData: nil, challengeName: nil, challengeResponses: nil)
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: password, username: username, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: [UserAttributes(name: "email", value: username)], userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 
     static private func confirmRegisterUserBody(clientId: String, username: String, code: String) -> Data? {
-        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: username, confirmationCode: code, forceAliasCreation: true, session: nil, userAttributes: [UserAttributes(name: "email", value: username)], userContextData: nil, challengeName: nil, challengeResponses: nil)
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: username, confirmationCode: code, forceAliasCreation: true, session: nil, userAttributes: [UserAttributes(name: "email", value: username)], userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        return request.data
+    }
+
+    static private func logoutBody(clientId: String, accessToken: String) -> Data? {
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: accessToken, previousPassword: nil, proposedPassword: nil)
+        return request.data
+    }
+
+    static private func validateUserBody(clientId: String, accessToken: String) -> Data? {
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: accessToken, previousPassword: nil, proposedPassword: nil)
+        return request.data
+    }
+
+    static private func changePasswordBody(clientId: String, accessToken: String, previousPassword: String, proposedPassword: String) -> Data? {
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: nil, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: accessToken, previousPassword: previousPassword, proposedPassword: proposedPassword)
+        return request.data
+    }
+
+    static private func resetPasswordBody(clientId: String, username: String) -> Data? {
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: nil, username: username, confirmationCode: nil, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
+        return request.data
+    }
+
+    static private func resetConfirmPasswordBody(clientId: String, username: String, password: String, code: String) -> Data? {
+        let request = AWSRequest(authParameters: nil, authFlow: nil, clientId: clientId, password: password, username: username, confirmationCode: code, forceAliasCreation: nil, session: nil, userAttributes: nil, userContextData: nil, challengeName: nil, challengeResponses: nil, accessToken: nil, previousPassword: nil, proposedPassword: nil)
         return request.data
     }
 }

@@ -12,11 +12,15 @@ public struct AWSResponse: Codable {
     public var authenticationResult: AuthenticationResult?
     public var session: String?
     public var userConfirmed: Bool?
+    public var userAttributes: [UserAttributes]?
+    public var username: String?
 
     enum CodingKeys: String, CodingKey {
         case authenticationResult = "AuthenticationResult"
         case session = "Session"
         case userConfirmed = "UserConfirmed"
+        case userAttributes = "UserAttributes"
+        case username = "Username"
     }
 }
 
