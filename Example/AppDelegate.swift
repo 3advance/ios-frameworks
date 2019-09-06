@@ -13,13 +13,15 @@ import AWS3A
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
+    let testClientId = ""
+
     var rootViewController: UIViewController {
         return ViewController()
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AWSService.shared.enableLogs = true
-        AWSService.shared.initialize(clientId: "3sp07ftnukvjcm05ovrn387evm")
+        AWSService.shared.initialize(clientId: self.testClientId)
         self.window = .init(frame: UIScreen.main.bounds)
         self.window?.rootViewController = self.rootViewController
         self.window?.makeKeyAndVisible()
