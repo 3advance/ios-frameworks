@@ -13,12 +13,14 @@ struct AWSPinpointRequest: Codable {
     var channelType: String?
     var address: String?
     var optOut: String?
+    var endpointStatus: String?
 
     enum CodingKeys: String, CodingKey {
         case user = "User"
         case channelType = "ChannelType"
         case address = "Address"
         case optOut = "OptOut"
+        case endpointStatus = "EndpointStatus"
     }
 }
 
@@ -88,7 +90,7 @@ extension AWSPinpointRequest {
 
 extension AWSPinpointRequest {
     static private func updateEndpoint(userId: String, pushToken: String?, optOut: String?) -> Data? {
-        let request = AWSPinpointRequest(user: UserParams(userId: userId), channelType: "APNS", address: pushToken, optOut: optOut)
+        let request = AWSPinpointRequest(user: UserParams(userId: userId), channelType: "APNS", address: pushToken, optOut: optOut, endpointStatus: "ACTIVE")
         return request.data
     }
 }
