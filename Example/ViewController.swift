@@ -32,6 +32,7 @@ class ViewController: UIViewController {
     var testRefreshToken = ""
     var testCode = ""
     var testSession = ""
+    var testUserId = ""
     
     // MARK: Lifecycle
 
@@ -50,6 +51,9 @@ class ViewController: UIViewController {
 //        AWSService.shared.resetConfirmPassword(username: self.testUsername, password: self.testPassword, code: self.testCode) { (success, error) in }
 //        AWSService.shared.requestSMSCode(phone: self.testPhoneNumber) { (success, error) in }
 //        AWSService.shared.confirmSMSCode(phone: self.testPhoneNumber, code: self.testCode, session: self.testSession) { (success, error) in }
+//        AWSService.shared.getEndpoint(userId: self.testUserId) { (success, error) in }
+//        AWSService.shared.updateEndpoint(userId: self.testUserId, pushToken: nil, optOut: "ALL") { (success, error) in }
+
     }
 
     override func loadView() {

@@ -17,6 +17,9 @@ import UIKit
 
     private var awsSession = URLSession()
     private var clientId = ""
+    private var pinpointAppId = ""
+    private var pinpointAccessKeyId = ""
+    private var pinpointSecretSigningKey = ""
 
     public typealias AWSCompletionHandler = (_ success: Any?, _ error: NSError?) -> Void
     public typealias AWSCompletionBoolHandler = (_ success: Bool) -> Void
@@ -37,10 +40,16 @@ import UIKit
         self.consoleLog("AWS3A SDK", "🔶 setupManager()")
     }
 
-
     public func initialize(clientId: String) {
         self.clientId = clientId
-        self.consoleLog("AWS3A SDK", "🔶 initialize(clientId: \(clientId)")
+        self.consoleLog("AWS3A SDK", "🔶 initialize(clientId: \(clientId))")
+    }
+
+    public func initializePinpoint(appId: String, accessKey: String, accessSecret: String) {
+        self.pinpointAppId = appId
+        self.pinpointAccessKeyId = accessKey
+        self.pinpointSecretSigningKey = accessSecret
+        self.consoleLog("AWS3A SDK", "🔶 initializePinpoint(appId: \(appId), accessKey: \(accessKey), accessSecret: \(accessSecret))")
     }
 
     // MARK: Log Methods
@@ -49,6 +58,82 @@ import UIKit
         if !self.enableLogs { return }
         print("❗️\(title ?? "AWS3A SDK")❗️")
         print("❗️\(log)❗️")
+    }
+
+    // MARK: Pinpoint Restful Methods
+
+    public func getEndpoint(userId: String, completion: @escaping AWSCompletionHandler) {
+        DispatchQueue(label: "background", qos: .background).async {
+            var urlRequest = AWSPinpointRequest.requestGetEndpoint(appId: self.pinpointAppId, userId: userId)
+            self.consoleLog("AWS3A SDK: Pinpoint Get Endpoint", "🌐 requestGetEndpoint(userId: \(userId))")
+            let account = AWSAccount(serviceName: "mobiletargeting", region: "us-east-1", accessKeyID: self.pinpointAccessKeyId, secretAccessKey: self.pinpointSecretSigningKey)
+            urlRequest.sign(for: account)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
+                guard let data = data, let response = response as? HTTPURLResponse else {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
+                    }
+                    return
+                }
+                let responseCode = response.statusCode
+                do {
+                    if responseCode.isValid {
+                        let res = try JSONDecoder().decode(AWSPinpointResponse.self, from: data)
+                        DispatchQueue.main.async {
+                            self.consoleLog("AWS3A SDK - getEndpoint: response", "✅ Success: [\(responseCode)] ❗️\n\(res.json)")
+                            completion(res, nil)
+                        }
+                    }
+                    else {
+                        let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
+                        DispatchQueue.main.async {
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
+                        }
+                    }
+                } catch let catchError {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
+                    }
+                }
+                }.resume()
+        }
+    }
+
+    public func updateEndpoint(userId: String, pushToken: String?, optOut: String?, completion: @escaping AWSCompletionHandler) {
+        DispatchQueue(label: "background", qos: .background).async {
+            var urlRequest = AWSPinpointRequest.requestUpdateEndpoint(appId: self.pinpointAppId, userId: userId, pushToken: pushToken, optOut: optOut)
+            self.consoleLog("AWS3A SDK: Pinpoint Update Endpoint", "🌐 updateEndpoint(userId: \(userId), pushToken: \(pushToken ?? "nil"))")
+            let account = AWSAccount(serviceName: "mobiletargeting", region: "us-east-1", accessKeyID: self.pinpointAccessKeyId, secretAccessKey: self.pinpointSecretSigningKey)
+            urlRequest.sign(for: account)
+            self.awsSession.dataTask(with: urlRequest) { data, response, error in
+                guard let data = data, let response = response as? HTTPURLResponse else {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: AWSError.unknownError.code, data: nil, error: AWSError.unknownError))
+                    }
+                    return
+                }
+                let responseCode = response.statusCode
+                do {
+                    if responseCode.isValid {
+                        let res = try JSONDecoder().decode(AWSPinpointResponse.self, from: data)
+                        DispatchQueue.main.async {
+                            self.consoleLog("AWS3A SDK - updateEndpoint: response", "✅ Success: [\(responseCode)] ❗️\n\(res.json)")
+                            completion(res, nil)
+                        }
+                    }
+                    else {
+                        let errorObject = try JSONDecoder().decode(AWSError.self, from: data)
+                        DispatchQueue.main.async {
+                            completion(nil, self.awsHandleError(responseCode: responseCode, error: errorObject))
+                        }
+                    }
+                } catch let catchError {
+                    DispatchQueue.main.async {
+                        completion(nil, self.awsHandleError(responseCode: responseCode, data: data, error: catchError))
+                    }
+                }
+                }.resume()
+        }
     }
 
     // MARK: AWS Restful Methods

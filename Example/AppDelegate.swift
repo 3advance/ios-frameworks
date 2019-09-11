@@ -14,6 +14,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     let testClientId = ""
+    let testAppId = ""
+    let testAccessKeyId = ""
+    let testAccessSecret = ""
 
     var rootViewController: UIViewController {
         return ViewController()
@@ -22,6 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         AWSService.shared.enableLogs = true
         AWSService.shared.initialize(clientId: self.testClientId)
+        AWSService.shared.initializePinpoint(appId: self.testAppId, accessKey: self.testAccessKeyId, accessSecret: self.testAccessSecret)
         self.window = .init(frame: UIScreen.main.bounds)
         self.window?.rootViewController = self.rootViewController
         self.window?.makeKeyAndVisible()

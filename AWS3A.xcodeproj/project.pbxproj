@@ -7,6 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		011F0B7423292A4800FB54E0 /* AWSPinpointRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0B7323292A4800FB54E0 /* AWSPinpointRequest.swift */; };
+		011F0B7623292A6100FB54E0 /* AWSPinpointResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0B7523292A6100FB54E0 /* AWSPinpointResponse.swift */; };
+		011F0C4A23294C9500FB54E0 /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C3F23294C9500FB54E0 /* Random.swift */; };
+		011F0C4B23294C9500FB54E0 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4023294C9500FB54E0 /* Utilities.swift */; };
+		011F0C4C23294C9500FB54E0 /* StreamCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4123294C9500FB54E0 /* StreamCryptor.swift */; };
+		011F0C4D23294C9500FB54E0 /* HMAC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4223294C9500FB54E0 /* HMAC.swift */; };
+		011F0C4E23294C9500FB54E0 /* Digest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4323294C9500FB54E0 /* Digest.swift */; };
+		011F0C4F23294C9500FB54E0 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4423294C9500FB54E0 /* Crypto.swift */; };
+		011F0C5023294C9500FB54E0 /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4523294C9500FB54E0 /* Cryptor.swift */; };
+		011F0C5123294C9500FB54E0 /* Updatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4623294C9500FB54E0 /* Updatable.swift */; };
+		011F0C5223294C9500FB54E0 /* SSLPointerTricks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4723294C9500FB54E0 /* SSLPointerTricks.swift */; };
+		011F0C5323294C9500FB54E0 /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4823294C9500FB54E0 /* Status.swift */; };
+		011F0C5423294C9500FB54E0 /* KeyDerivation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C4923294C9500FB54E0 /* KeyDerivation.swift */; };
+		011F0C632329627800FB54E0 /* URLRequest+AWSAccountSigning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C5F2329627800FB54E0 /* URLRequest+AWSAccountSigning.swift */; };
+		011F0C642329627800FB54E0 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C602329627800FB54E0 /* String+Extensions.swift */; };
+		011F0C652329627800FB54E0 /* AWSAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C612329627800FB54E0 /* AWSAccount.swift */; };
+		011F0C662329627800FB54E0 /* Chunking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 011F0C622329627800FB54E0 /* Chunking.swift */; };
 		01C51EE723216B0000744067 /* AWSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C51EE623216B0000744067 /* AWSService.swift */; };
 		01C51EEA232172C200744067 /* AWSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C51EE9232172C200744067 /* AWSResponse.swift */; };
 		01C51EEC232173DB00744067 /* AWSRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C51EEB232173DB00744067 /* AWSRequest.swift */; };
@@ -75,6 +92,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		011F0B7323292A4800FB54E0 /* AWSPinpointRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AWSPinpointRequest.swift; sourceTree = "<group>"; };
+		011F0B7523292A6100FB54E0 /* AWSPinpointResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AWSPinpointResponse.swift; sourceTree = "<group>"; };
+		011F0C3F23294C9500FB54E0 /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
+		011F0C4023294C9500FB54E0 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		011F0C4123294C9500FB54E0 /* StreamCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StreamCryptor.swift; sourceTree = "<group>"; };
+		011F0C4223294C9500FB54E0 /* HMAC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HMAC.swift; sourceTree = "<group>"; };
+		011F0C4323294C9500FB54E0 /* Digest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Digest.swift; sourceTree = "<group>"; };
+		011F0C4423294C9500FB54E0 /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		011F0C4523294C9500FB54E0 /* Cryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptor.swift; sourceTree = "<group>"; };
+		011F0C4623294C9500FB54E0 /* Updatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Updatable.swift; sourceTree = "<group>"; };
+		011F0C4723294C9500FB54E0 /* SSLPointerTricks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSLPointerTricks.swift; sourceTree = "<group>"; };
+		011F0C4823294C9500FB54E0 /* Status.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
+		011F0C4923294C9500FB54E0 /* KeyDerivation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyDerivation.swift; sourceTree = "<group>"; };
+		011F0C5F2329627800FB54E0 /* URLRequest+AWSAccountSigning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URLRequest+AWSAccountSigning.swift"; sourceTree = "<group>"; };
+		011F0C602329627800FB54E0 /* String+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
+		011F0C612329627800FB54E0 /* AWSAccount.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSAccount.swift; sourceTree = "<group>"; };
+		011F0C622329627800FB54E0 /* Chunking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chunking.swift; sourceTree = "<group>"; };
 		01C51EE623216B0000744067 /* AWSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AWSService.swift; sourceTree = "<group>"; };
 		01C51EE9232172C200744067 /* AWSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AWSResponse.swift; sourceTree = "<group>"; };
 		01C51EEB232173DB00744067 /* AWSRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AWSRequest.swift; sourceTree = "<group>"; };
@@ -172,6 +206,44 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		011F0AD52329283900FB54E0 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				011F0C5E2329627800FB54E0 /* SwiftAWSSignatureV4 */,
+				011F0C3E23294C9500FB54E0 /* Cryptor */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		011F0C3E23294C9500FB54E0 /* Cryptor */ = {
+			isa = PBXGroup;
+			children = (
+				011F0C3F23294C9500FB54E0 /* Random.swift */,
+				011F0C4023294C9500FB54E0 /* Utilities.swift */,
+				011F0C4123294C9500FB54E0 /* StreamCryptor.swift */,
+				011F0C4223294C9500FB54E0 /* HMAC.swift */,
+				011F0C4323294C9500FB54E0 /* Digest.swift */,
+				011F0C4423294C9500FB54E0 /* Crypto.swift */,
+				011F0C4523294C9500FB54E0 /* Cryptor.swift */,
+				011F0C4623294C9500FB54E0 /* Updatable.swift */,
+				011F0C4723294C9500FB54E0 /* SSLPointerTricks.swift */,
+				011F0C4823294C9500FB54E0 /* Status.swift */,
+				011F0C4923294C9500FB54E0 /* KeyDerivation.swift */,
+			);
+			path = Cryptor;
+			sourceTree = "<group>";
+		};
+		011F0C5E2329627800FB54E0 /* SwiftAWSSignatureV4 */ = {
+			isa = PBXGroup;
+			children = (
+				011F0C5F2329627800FB54E0 /* URLRequest+AWSAccountSigning.swift */,
+				011F0C602329627800FB54E0 /* String+Extensions.swift */,
+				011F0C612329627800FB54E0 /* AWSAccount.swift */,
+				011F0C622329627800FB54E0 /* Chunking.swift */,
+			);
+			path = SwiftAWSSignatureV4;
+			sourceTree = "<group>";
+		};
 		01C51EE523216AE100744067 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,6 +258,8 @@
 				01C51EEB232173DB00744067 /* AWSRequest.swift */,
 				01C51EE9232172C200744067 /* AWSResponse.swift */,
 				01C51EED2321770E00744067 /* AWSError.swift */,
+				011F0B7323292A4800FB54E0 /* AWSPinpointRequest.swift */,
+				011F0B7523292A6100FB54E0 /* AWSPinpointResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -240,6 +314,7 @@
 				3D9C42A122745900000A6585 /* AWS3A.swift */,
 				01C51EE8232172A900744067 /* Models */,
 				01C51EE523216AE100744067 /* Services */,
+				011F0AD52329283900FB54E0 /* Helpers */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -659,11 +734,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				011F0C642329627800FB54E0 /* String+Extensions.swift in Sources */,
+				011F0C5223294C9500FB54E0 /* SSLPointerTricks.swift in Sources */,
+				011F0C4B23294C9500FB54E0 /* Utilities.swift in Sources */,
+				011F0C632329627800FB54E0 /* URLRequest+AWSAccountSigning.swift in Sources */,
+				011F0C652329627800FB54E0 /* AWSAccount.swift in Sources */,
+				011F0C4A23294C9500FB54E0 /* Random.swift in Sources */,
 				3D9C42A222745900000A6585 /* AWS3A.swift in Sources */,
 				01C51EEE2321770E00744067 /* AWSError.swift in Sources */,
 				01C51EE723216B0000744067 /* AWSService.swift in Sources */,
+				011F0B7423292A4800FB54E0 /* AWSPinpointRequest.swift in Sources */,
 				01C51EEA232172C200744067 /* AWSResponse.swift in Sources */,
+				011F0C5123294C9500FB54E0 /* Updatable.swift in Sources */,
+				011F0C5023294C9500FB54E0 /* Cryptor.swift in Sources */,
+				011F0C5323294C9500FB54E0 /* Status.swift in Sources */,
+				011F0C662329627800FB54E0 /* Chunking.swift in Sources */,
+				011F0C4F23294C9500FB54E0 /* Crypto.swift in Sources */,
+				011F0B7623292A6100FB54E0 /* AWSPinpointResponse.swift in Sources */,
+				011F0C4E23294C9500FB54E0 /* Digest.swift in Sources */,
+				011F0C4C23294C9500FB54E0 /* StreamCryptor.swift in Sources */,
+				011F0C4D23294C9500FB54E0 /* HMAC.swift in Sources */,
 				01C51EEC232173DB00744067 /* AWSRequest.swift in Sources */,
+				011F0C5423294C9500FB54E0 /* KeyDerivation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
