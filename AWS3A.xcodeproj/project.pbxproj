@@ -248,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				01C51EE623216B0000744067 /* AWSService.swift */,
+				011F0AD52329283900FB54E0 /* Helpers */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -314,7 +315,6 @@
 				3D9C42A122745900000A6585 /* AWS3A.swift */,
 				01C51EE8232172A900744067 /* Models */,
 				01C51EE523216AE100744067 /* Services */,
-				011F0AD52329283900FB54E0 /* Helpers */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
