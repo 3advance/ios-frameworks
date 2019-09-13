@@ -16,12 +16,7 @@
 //
 
 import Foundation
-
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-	import CommonCrypto
-#elseif os(Linux)
-	import OpenSSL
-#endif
+import CommonCrypto
 
 ///
 /// Encrypts or decrypts return results as they become available.
@@ -34,35 +29,6 @@ import Foundation
 ///
 public class StreamCryptor {
 	
-	#if os(Linux)
-	
-		//
-		// Key sizes
-		//
-		static let kCCKeySizeAES128          = 16
-		static let kCCKeySizeAES192          = 24
-		static let kCCKeySizeAES256          = 32
-		static let kCCKeySizeDES             = 8
-		static let kCCKeySize3DES            = 24
-		static let kCCKeySizeMinCAST         = 5
-		static let kCCKeySizeMaxCAST         = 16
-		static let kCCKeySizeMinRC2          = 1
-		static let kCCKeySizeMaxRC2          = 128
-		static let kCCKeySizeMinBlowfish     = 8
-		static let kCCKeySizeMaxBlowfish     = 56
-	
-		//
-		// Block sizes
-		//
-		static let kCCBlockSizeAES128        = 16
-		static let kCCBlockSizeDES           = 8
-		static let kCCBlockSize3DES          = 8
-		static let kCCBlockSizeCAST          = 8
-		static let kCCBlockSizeRC2           = 8
-		static let kCCBlockSizeBlowfish      = 8
-	
-	#endif
-	
     ///
     /// Enumerates Cryptor operations
     ///
@@ -73,38 +39,20 @@ public class StreamCryptor {
 		
 		/// Decrypting
         case decrypt
-        
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-		
-        	/// Convert to native `CCOperation`
-	        func nativeValue() -> CCOperation {
-			
-    	        switch self {
-				
-        	    case .encrypt:
-					return CCOperation(kCCEncrypt)
-				
-	            case .decrypt:
-					return CCOperation(kCCDecrypt)
-        	    }
-	        }
-		
-		#elseif os(Linux)
-		
-			/// Convert to native value
-			func nativeValue() -> UInt32 {
-			
-				switch self {
-		
-				case .encrypt:
-					return 0
-			
-				case .decrypt:
-					return 1
-				}
-			}
-		
-		#endif
+
+
+        /// Convert to native `CCOperation`
+        func nativeValue() -> CCOperation {
+
+            switch self {
+
+            case .encrypt:
+                return CCOperation(kCCEncrypt)
+
+            case .decrypt:
+                return CCOperation(kCCDecrypt)
+            }
+        }
     }
 	
     ///
@@ -186,74 +134,37 @@ public class StreamCryptor {
 		
 		/// No options
 		public static let none = Options(rawValue: 0)
-		
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-		
-			/// Use padding. Needed unless the input is a integral number of blocks long.
-			public static var pkcs7Padding =  Options(rawValue:kCCOptionPKCS7Padding)
-		
-			/// Electronic Code Book Mode. Don't use this.
-			public static var ecbMode = Options(rawValue:kCCOptionECBMode)
-		
-		#elseif os(Linux)
-		
-			/// Use padding. Needed unless the input is a integral number of blocks long.
-			public static var pkcs7Padding =  Options(rawValue:0x0001)
-		
-			/// Electronic Code Book Mode. Don't use this.
-			public static var ecbMode = Options(rawValue:0x0002)
-		
-		#endif
+
+        /// Use padding. Needed unless the input is a integral number of blocks long.
+        public static var pkcs7Padding =  Options(rawValue:kCCOptionPKCS7Padding)
+
+        /// Electronic Code Book Mode. Don't use this.
+        public static var ecbMode = Options(rawValue:kCCOptionECBMode)
 	}
 	
     ///
     /// Enumerates available algorithms
     ///
     public enum Algorithm {
-		
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-		
-			/// Advanced Encryption Standard
-			/// - Note: aes and aes128 are equivalent.
-			case aes, aes128, aes192, aes256
-			
-			/// Data Encryption Standard
-			case des
-			
-			/// Triple des
-			case tripleDes
-			
-			/// cast
-			case cast
-			
-			/// rc2
-			case rc2
-			
-			/// blowfish
-			case blowfish
 
-		#elseif os(Linux)
-		
-			/// Advanced Encryption Standard
-			/// - Note: aes and aes128 are equivalent.
-			case aes, aes128, aes192, aes256
-			
-			/// Data Encryption Standard
-			case des
-			
-			/// Triple des
-			case tripleDes
-			
-			/// cast
-			case cast
-			
-			/// rc2
-			case rc2
-			
-			/// blowfish
-			case blowfish
-			
-		#endif
+        /// Advanced Encryption Standard
+        /// - Note: aes and aes128 are equivalent.
+        case aes, aes128, aes192, aes256
+
+        /// Data Encryption Standard
+        case des
+
+        /// Triple des
+        case tripleDes
+
+        /// cast
+        case cast
+
+        /// rc2
+        case rc2
+
+        /// blowfish
+        case blowfish
 
         /// Blocksize, in bytes, of algorithm.
 		public var blockSize: Int {
@@ -309,103 +220,32 @@ public class StreamCryptor {
 				return kCCKeySizeMinBlowfish
 			}
 		}
-		
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-		
-			/// Native, CommonCrypto constant for algorithm.
-			func nativeValue() -> CCAlgorithm {
-				
-				switch self {
-					
-				case .aes, .aes128, .aes192, .aes256:
-					return CCAlgorithm(kCCAlgorithmAES)
-					
-				case .des:
-					return CCAlgorithm(kCCAlgorithmDES)
-					
-				case .tripleDes:
-					return CCAlgorithm(kCCAlgorithm3DES)
-					
-				case .cast:
-					return CCAlgorithm(kCCAlgorithmCAST)
-					
-				case .rc2:
-					return CCAlgorithm(kCCAlgorithmRC2)
-					
-				case .blowfish:
-					return CCAlgorithm(kCCAlgorithmBlowfish)
-				}
-			}
-			
-		#elseif os(Linux)
-		
-			/// Native, OpenSSL function for algorithm.
-			func nativeValue(options: Options) -> OpaquePointer? {
-			
-				if options == .pkcs7Padding || options == .none {
-			
-					switch self {
-					
-					case .aes, .aes128:
-						return .init(EVP_aes_128_cbc())
-		
-					case .aes192:
-						return .init(EVP_aes_192_cbc())
-		
-					case .aes256:
-						return .init(EVP_aes_256_cbc())
-					
-					case .des:
-						return .init(EVP_des_cbc())
-					
-					case .tripleDes:
-						return .init(EVP_des_ede3_cbc())
-					
-					case .cast:
-						return .init(EVP_cast5_cbc())
-					
-					case .rc2:
-						return .init(EVP_rc2_cbc())
-					
-					case .blowfish:
-						return .init(EVP_bf_cbc())
-					}
-				}
-			
-				if options == .ecbMode {
-				
-					switch self {
-					
-					case .aes, .aes128:
-						return .init(EVP_aes_128_ecb())
-		
-					case .aes192:
-						return .init(EVP_aes_192_ecb())
-		
-					case .aes256:
-						return .init(EVP_aes_256_ecb())
-					
-					case .des:
-						return .init(EVP_des_ecb())
-					
-					case .tripleDes:
-						return .init(EVP_des_ede3_ecb())
-					
-					case .cast:
-						return .init(EVP_cast5_ecb())
-					
-					case .rc2:
-						return .init(EVP_rc2_ecb())
-					
-					case .blowfish:
-						return .init(EVP_bf_ecb())
-					}
-				}
-	
-				fatalError("Unsupported options and/or algorithm.")
-			}
-		
-		#endif
+
+
+        /// Native, CommonCrypto constant for algorithm.
+        func nativeValue() -> CCAlgorithm {
+
+            switch self {
+
+            case .aes, .aes128, .aes192, .aes256:
+                return CCAlgorithm(kCCAlgorithmAES)
+
+            case .des:
+                return CCAlgorithm(kCCAlgorithmDES)
+
+            case .tripleDes:
+                return CCAlgorithm(kCCAlgorithm3DES)
+
+            case .cast:
+                return CCAlgorithm(kCCAlgorithmCAST)
+
+            case .rc2:
+                return CCAlgorithm(kCCAlgorithmRC2)
+
+            case .blowfish:
+                return CCAlgorithm(kCCAlgorithmBlowfish)
+            }
+        }
 		
 		///
         /// Determines the valid key size for this algorithm
@@ -414,59 +254,26 @@ public class StreamCryptor {
 		///
         func validKeySize() -> ValidKeySize {
 			
-			#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-			
-				switch self {
-					
-				case .aes, .aes128, .aes192, .aes256:
-					return .discrete([kCCKeySizeAES128, kCCKeySizeAES192, kCCKeySizeAES256])
-					
-				case .des:
-					return .fixed(kCCKeySizeDES)
-					
-				case .tripleDes:
-					return .fixed(kCCKeySize3DES)
-					
-				case .cast:
-					return .range(kCCKeySizeMinCAST, kCCKeySizeMaxCAST)
-					
-				case .rc2:
-					return .range(kCCKeySizeMinRC2, kCCKeySizeMaxRC2)
-					
-				case .blowfish:
-					return .range(kCCKeySizeMinBlowfish, kCCKeySizeMaxBlowfish)
-				}
-				
-			#elseif os(Linux)
-			
-				switch self {
-					
-				case .aes, .aes128:
-					return .fixed(kCCKeySizeAES128)
-					
-				case .aes192:
-					return .fixed(kCCKeySizeAES192)
-					
-				case .aes256:
-					return .fixed(kCCKeySizeAES256)
-					
-				case .des:
-					return .fixed(kCCKeySizeDES)
-					
-				case .tripleDes:
-					return .fixed(kCCKeySize3DES)
-					
-				case .cast:
-					return .range(kCCKeySizeMinCAST, kCCKeySizeMaxCAST)
-					
-				case .rc2:
-					return .range(kCCKeySizeMinRC2, kCCKeySizeMaxRC2)
-					
-				case .blowfish:
-					return .range(kCCKeySizeMinBlowfish, kCCKeySizeMaxBlowfish)
-				}
-				
-			#endif
+            switch self {
+
+            case .aes, .aes128, .aes192, .aes256:
+                return .discrete([kCCKeySizeAES128, kCCKeySizeAES192, kCCKeySizeAES256])
+
+            case .des:
+                return .fixed(kCCKeySizeDES)
+
+            case .tripleDes:
+                return .fixed(kCCKeySize3DES)
+
+            case .cast:
+                return .range(kCCKeySizeMinCAST, kCCKeySizeMaxCAST)
+
+            case .rc2:
+                return .range(kCCKeySizeMinRC2, kCCKeySizeMaxRC2)
+
+            case .blowfish:
+                return .range(kCCKeySizeMinBlowfish, kCCKeySizeMaxBlowfish)
+            }
         }
 		
 		///
@@ -503,23 +310,9 @@ public class StreamCryptor {
 	///
 	private var haveContext: Bool = false
 
-	#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-	
-		/// CommonCrypto Context
-		private var context = UnsafeMutablePointer<CCCryptorRef?>.allocate(capacity: 1)
-	
-	#elseif os(Linux)
-	
-		/// OpenSSL Cipher Context
-		private let context: OpaquePointer? = .init(EVP_CIPHER_CTX_new())
-	
-		/// Operation
-		private var operation: Operation = .encrypt
-	
-		/// The algorithm
-		private var algorithm: Algorithm
-	
-	#endif
+
+    /// CommonCrypto Context
+    private var context = UnsafeMutablePointer<CCCryptorRef?>.allocate(capacity: 1)
 	
 	
 	// MARK: Lifecycle Methods
@@ -547,62 +340,20 @@ public class StreamCryptor {
 			throw CryptorError.invalidIVSizeOrLength
 		}
 		
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-		
-			let rawStatus = CCCryptorCreate(operation.nativeValue(), algorithm.nativeValue(), CCOptions(options.rawValue), keyBuffer, keyByteCount, ivBuffer, self.context)
-		
-			if let status = Status.fromRaw(status: rawStatus) {
-		
-				self.status = status
-		
-			} else {
-		
-				throw CryptorError.fail(rawStatus, "Cryptor init returned unexpected status.")
-			}
-			
-			self.haveContext = true
-		
-		#elseif os(Linux)
-		
-			self.algorithm = algorithm
-			self.operation = operation
-		
-			var rawStatus: Int32
-		
-			switch self.operation {
-			
-			case .encrypt:
-				rawStatus = EVP_EncryptInit_ex(.make(optional: self.context), .make(optional: algorithm.nativeValue(options: options)), nil, keyBuffer, ivBuffer)
-		
-			case .decrypt:
-				rawStatus = EVP_DecryptInit_ex(.make(optional: self.context), .make(optional: algorithm.nativeValue(options: options)), nil, keyBuffer, ivBuffer)
-			}
-		
-			if rawStatus == 0 {
-			
-				let errorCode = ERR_get_error()
-				if let status = Status.fromRaw(status: errorCode) {
-					self.status = status
-				} else {
 
-					throw CryptorError.fail(Int32(errorCode), "Cryptor init returned unexpected status.")
-				}
-			}
-			
-			self.haveContext = true
-		
-			// Default to no padding...
-			var needPadding: Int32 = 0
-			if options == .pkcs7Padding {
-				needPadding = 1
-			}
-		
-			// Note: This call must be AFTER the init call above...
-			EVP_CIPHER_CTX_set_padding(.make(optional: self.context), needPadding)
-		
-			self.status = Status.success
-		
-		#endif
+
+        let rawStatus = CCCryptorCreate(operation.nativeValue(), algorithm.nativeValue(), CCOptions(options.rawValue), keyBuffer, keyByteCount, ivBuffer, self.context)
+
+        if let status = Status.fromRaw(status: rawStatus) {
+
+            self.status = status
+
+        } else {
+
+            throw CryptorError.fail(rawStatus, "Cryptor init returned unexpected status.")
+        }
+
+        self.haveContext = true
 		
 	}
 	
@@ -668,41 +419,32 @@ public class StreamCryptor {
 		if self.haveContext == false {
 			return
 		}
-		
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-			
-			// Ensure we've got a context before attempting to get rid of it...
-			if self.context.pointee == nil {
-				return
-			}
-			
-			let rawStatus = CCCryptorRelease(self.context.pointee)
-			if let status = Status.fromRaw(status: rawStatus) {
-			
-				if status != .success {
-				
-					NSLog("WARNING: CCCryptoRelease failed with status \(rawStatus).")
-				}
-			
-			} else {
-			
-				fatalError("CCCryptorUpdate returned unexpected status.")
-			}
-		
-			#if swift(>=4.1)
-				context.deallocate()
-			#else
-				context.deallocate(capacity: 1)
-			#endif
-		
-			self.haveContext = false
-		
-		#elseif os(Linux)
 
-			EVP_CIPHER_CTX_free(.make(optional: self.context))
-			self.haveContext = false
-		
-		#endif
+        // Ensure we've got a context before attempting to get rid of it...
+        if self.context.pointee == nil {
+            return
+        }
+
+        let rawStatus = CCCryptorRelease(self.context.pointee)
+        if let status = Status.fromRaw(status: rawStatus) {
+
+            if status != .success {
+
+                NSLog("WARNING: CCCryptoRelease failed with status \(rawStatus).")
+            }
+
+        } else {
+
+            fatalError("CCCryptorUpdate returned unexpected status.")
+        }
+
+        #if swift(>=4.1)
+        context.deallocate()
+        #else
+        context.deallocate(capacity: 1)
+        #endif
+
+        self.haveContext = false
 	}
 	
 	// MARK: Public Methods
@@ -822,47 +564,13 @@ public class StreamCryptor {
 	public func update(bufferIn: UnsafeRawPointer, byteCountIn: Int, bufferOut: UnsafeMutablePointer<UInt8>, byteCapacityOut: Int, byteCountOut: inout Int) -> Status {
 		
         if self.status == .success {
-			
-			#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 
-	            let rawStatus = CCCryptorUpdate(self.context.pointee, bufferIn, byteCountIn, bufferOut, byteCapacityOut, &byteCountOut)
-				if let status = Status.fromRaw(status: rawStatus) {
-        	    	self.status =  status
-				} else {
-                	fatalError("CCCryptorUpdate returned unexpected status.")
-            	}
-
-			#elseif os(Linux)
-
-				var rawStatus: Int32
-				var outLength: Int32 = 0
-			
-				switch self.operation {
-				
-				case .encrypt:
-					rawStatus = EVP_EncryptUpdate(.make(optional: self.context), bufferOut, &outLength, bufferIn.assumingMemoryBound(to: UInt8.self), Int32(byteCountIn))
-					
-				case .decrypt:
-					rawStatus = EVP_DecryptUpdate(.make(optional: self.context), bufferOut, &outLength, bufferIn.assumingMemoryBound(to: UInt8.self), Int32(byteCountIn))
-				}
-			
-				byteCountOut = Int(outLength)
-			
-				if rawStatus == 0 {
-					
-					let errorCode = ERR_get_error()
-					if let status = Status.fromRaw(status: errorCode) {
-						self.status = status
-					} else {
-						fatalError("Cryptor update returned unexpected status.")
-					}
-				
-				} else {
-					
-					self.status = Status.success
-				}
-			
-			#endif
+            let rawStatus = CCCryptorUpdate(self.context.pointee, bufferIn, byteCountIn, bufferOut, byteCapacityOut, &byteCountOut)
+            if let status = Status.fromRaw(status: rawStatus) {
+                self.status =  status
+            } else {
+                fatalError("CCCryptorUpdate returned unexpected status.")
+            }
 
         }
 		
@@ -888,47 +596,13 @@ public class StreamCryptor {
 	public func final(bufferOut: UnsafeMutablePointer<UInt8>, byteCapacityOut: Int, byteCountOut: inout Int) -> Status {
 		
 		if self.status == Status.success {
-			
-			#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-			
-	            let rawStatus = CCCryptorFinal(self.context.pointee, bufferOut, byteCapacityOut, &byteCountOut)
-				if let status = Status.fromRaw(status: rawStatus) {
-        	        self.status =  status
-				} else {
-	                fatalError("CCCryptorUpdate returned unexpected status.")
-    	        }
-			
-			#elseif os(Linux)
-			
-				var rawStatus: Int32
-				var outLength: Int32 = Int32(byteCapacityOut)
-			
-				switch self.operation {
-				
-				case .encrypt:
-					rawStatus = EVP_EncryptFinal_ex(.make(optional: self.context), bufferOut, &outLength)
-				
-				case .decrypt:
-					rawStatus = EVP_DecryptFinal_ex(.make(optional: self.context), bufferOut, &outLength)
-				}
-			
-				byteCountOut = Int(outLength)
-			
-				if rawStatus == 0 {
-				
-					let errorCode = ERR_get_error()
-					if let status = Status.fromRaw(status: errorCode) {
-						self.status = status
-					} else {
-						fatalError("Cryptor final returned unexpected status.")
-					}
-				
-				} else {
-					
-					self.status = Status.success
-				}
-			
-			#endif
+
+            let rawStatus = CCCryptorFinal(self.context.pointee, bufferOut, byteCapacityOut, &byteCountOut)
+            if let status = Status.fromRaw(status: rawStatus) {
+                self.status =  status
+            } else {
+                fatalError("CCCryptorUpdate returned unexpected status.")
+            }
         }
 		
         return self.status
@@ -945,20 +619,7 @@ public class StreamCryptor {
 	/// - Returns: The final output length
 	///
 	public func getOutputLength(inputByteCount: Int, isFinal: Bool = false) -> Int {
-		
-		#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-
-	        return CCCryptorGetOutputLength(self.context.pointee, inputByteCount, isFinal)
-
-		#elseif os(Linux)
-			
-			if inputByteCount == 0 {
-				return self.algorithm.blockSize
-			}
-		
-			return (inputByteCount + self.algorithm.blockSize - (inputByteCount % self.algorithm.blockSize))
-		
-		#endif
+        return CCCryptorGetOutputLength(self.context.pointee, inputByteCount, isFinal)
     }
 	
 }

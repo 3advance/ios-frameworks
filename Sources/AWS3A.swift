@@ -8,3 +8,6 @@
 
 // Include Foundation
 @_exported import Foundation
+@_exported import UIKit
+@_exported import Dispatch
+@_exported import CommonCrypto

@@ -16,14 +16,8 @@
 //
 
 import Foundation
+import CommonCrypto
 
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
-	import CommonCrypto
-#elseif os(Linux)
-	import OpenSSL
-#endif
-
-#if os(macOS) || os(iOS) || os(tvOS) || os(watchOS)
 ///
 /// Links the native CommonCryptoStatus enumeration to Swift versions.
 ///
@@ -31,59 +25,59 @@ public enum Status: CCCryptorStatus, Swift.Error, CustomStringConvertible {
 
     /// Successful
     case success
-	
+
     /// Parameter Error
     case paramError
-	
+
     /// Buffer too Small
     case bufferTooSmall
-	
+
     /// Memory Failure
     case memoryFailure
-	
+
     /// Alignment Error
     case alignmentError
-	
+
     /// Decode Error
     case decodeError
-	
+
     /// Unimplemented
     case unimplemented
-	
+
     /// Overflow
     case overflow
-	
+
     /// Random Number Generator Err
     case rngFailure
-    
+
     ///
     /// Converts this value to a native `CCCryptorStatus` value.
     ///
-	public func toRaw() -> CCCryptorStatus {
-		
+    public func toRaw() -> CCCryptorStatus {
+
         switch self {
-			
+
         case .success:
-			return CCCryptorStatus(kCCSuccess)
+            return CCCryptorStatus(kCCSuccess)
         case .paramError:
-			return CCCryptorStatus(kCCParamError)
+            return CCCryptorStatus(kCCParamError)
         case .bufferTooSmall:
-   			return CCCryptorStatus(kCCBufferTooSmall)
+            return CCCryptorStatus(kCCBufferTooSmall)
         case .memoryFailure:
-			return CCCryptorStatus(kCCMemoryFailure)
+            return CCCryptorStatus(kCCMemoryFailure)
         case .alignmentError:
-   			return CCCryptorStatus(kCCAlignmentError)
+            return CCCryptorStatus(kCCAlignmentError)
         case .decodeError:
-			return CCCryptorStatus(kCCDecodeError)
+            return CCCryptorStatus(kCCDecodeError)
         case .unimplemented:
-			return CCCryptorStatus(kCCUnimplemented)
+            return CCCryptorStatus(kCCUnimplemented)
         case .overflow:
-			return CCCryptorStatus(kCCOverflow)
+            return CCCryptorStatus(kCCOverflow)
         case .rngFailure:
-			return CCCryptorStatus(kCCRNGFailure)
+            return CCCryptorStatus(kCCRNGFailure)
         }
     }
-    
+
     ///
     /// Human readable descriptions of the values. (Not needed in Swift 2.0?)
     ///
@@ -102,16 +96,16 @@ public enum Status: CCCryptorStatus, Swift.Error, CustomStringConvertible {
     ///
     /// Obtain human-readable string from enum value.
     ///
-	public var description: String {
-		
+    public var description: String {
+
         return (Status.descriptions[self] != nil) ? Status.descriptions[self]! : ""
     }
 
-	///
+    ///
     /// Create enum value from raw `CCCryptorStatus` value.
     ///
-	public static func fromRaw(status: CCCryptorStatus) -> Status? {
-		
+    public static func fromRaw(status: CCCryptorStatus) -> Status? {
+
         let from = [
             kCCSuccess: success,
             kCCParamError: paramError,
@@ -123,111 +117,11 @@ public enum Status: CCCryptorStatus, Swift.Error, CustomStringConvertible {
             kCCOverflow: overflow,
             kCCRNGFailure: rngFailure
         ]
-        
+
         return from[Int(status)]
-    
+
     }
 }
-	
-#elseif os(Linux)
-	
-///
-/// Error status
-///
-public enum Status: Swift.Error, CustomStringConvertible {
-	
-	/// Success
-	case success
-	
-	/// Unimplemented with reason
-	case unimplemented(String)
-	
-	/// Not supported with reason
-	case notSupported(String)
-	
-	/// Parameter Error
-	case paramError
-	
-	/// Failure with error code
- 	case fail(UInt)
-	
-	/// Random Byte Generator Failure with error code
-	case rngFailure(UInt)
-	
-	/// The error code itself
-	public var code: Int {
-		
-		switch self {
-			
-		case .success:
-			return 0
-			
-		case .notSupported:
-			return -1
-			
-		case .unimplemented:
-			return -2
-			
-		case .paramError:
-			return -3
-			
-		case .fail(let code):
-			return Int(code)
-			
-		case .rngFailure(let code):
-			return Int(code)
-		}
-	}
-	
-	///
-	/// Create enum value from raw `SSL error code` value.
-	///
-	public static func fromRaw(status: UInt) -> Status? {
-		
-		return Status.fail(status)
-	}
-	
-	///
-	/// Obtain human-readable string for the error code.
-	///
-	public var description: String {
-		
-		switch self {
-			
-		case .success:
-			return "No error"
-			
-		case .notSupported(let reason):
-			return "Not supported: \(reason)"
-			
-		case .unimplemented(let reason):
-			return "Not implemented: \(reason)"
-			
-		case .paramError:
-			return "Invalid parameters passed"
-			
-		case .fail(let errorCode):
-			return "ERROR: code: \(errorCode), reason: \(errToString(ERR_error_string(UInt(errorCode), nil)))"
-
-		case .rngFailure(let errorCode):
-			return "Random Byte Generator ERROR: code: \(errorCode), reason: \(errToString(ERR_error_string(UInt(errorCode), nil)))"
-		}
-	}
-}
-
-//	MARK: Operators
-
-func == (lhs: Status, rhs: Status) -> Bool {
-	
-	return lhs.code == rhs.code
-}
-
-func != (lhs: Status, rhs: Status) -> Bool {
-	
-	return lhs.code != rhs.code
-}
-
-#endif
 
 ///
 /// CryptorError
