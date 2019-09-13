@@ -8,6 +8,8 @@
 
 // Include Foundation
 @_exported import Foundation
+#if os(iOS)
 @_exported import UIKit
 @_exported import Dispatch
 @_exported import CommonCrypto
+#endif

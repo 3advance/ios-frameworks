@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = "2.0"
   s.osx.deployment_target     = "10.10"
   s.source_files              = "Sources/**/*"
-  s.ios.frameworks            = "Foundation", "UIKit", "Dispatch", "CommonCrypto"
+  s.ios.frameworks            = "Foundation", "UIKit"
 end
